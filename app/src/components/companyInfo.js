@@ -1,6 +1,6 @@
+// Импорт компонентов
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -15,16 +15,21 @@ import LocalPhoneIcon from '@material-ui/icons/LocalPhone';
 import LinkIcon from '@material-ui/icons/Link';
 
 
+
+// Класс компонента Информация о компании
 class CompanyInfo extends React.Component {
 
+	// Конструктор
 	constructor(props) {
 		super(props);
 		this.props = props;
 		this.NO_INFO = "Нет информации"
 	}
 
+	// Рендер
 	render() {
-		const { data } = this.props; 
+		const { data } = this.props;
+		// Выборка данных о компании из props
 		const categories = (data.Categories)? data.Categories.map(item => {
 			return item.name;
 		}) : [this.NO_INFO];
@@ -101,8 +106,10 @@ class CompanyInfo extends React.Component {
 	}
 }
 
+// Проверка типов
 CompanyInfo.propTypes = {
 	data: PropTypes.object.isRequired
 };
 
+// Экспорт компонента без своих стилей
 export default CompanyInfo;

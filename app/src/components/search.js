@@ -1,34 +1,36 @@
+// Импортируемые модули
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Popper from '@material-ui/core/Popper';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import Fade from '@material-ui/core/Fade';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import axios from 'axios';
 
-// Components
+// Подключаемые компонеты
 import YMap from './map.js';
 import CompanyInfo from './companyInfo.js';
 
+// Стили данного компонета добавляет к существующим props.classes
+// стили классов указанные в styles 
 const styles = theme => ({
-	menuItem: {
-		backgroundColor: 'gray',
-	},
   root: {
 		padding: '20px',
   },
   typography: {
     padding: '20px',
-  },
+  }
 });
 
-class Dropdown extends React.Component {
+
+// Класс компонента Поиск
+class Search extends React.Component {
   
+	// Конструктор класса
 	constructor(props) {
 		super(props);
 		this.props = props;
@@ -44,6 +46,7 @@ class Dropdown extends React.Component {
 		this.liItem = -1;
 	}
 
+	// Управление кликом по полю ввода текста
   handleClick = placement => event => {
     const { currentTarget } = event;
     this.setState(state => ({
@@ -53,6 +56,7 @@ class Dropdown extends React.Component {
     }));	
   };
 
+	// Управление кликом или нажатием Enter по элементу выпадающего списка
 	handleItemClick = (e) => {
 		const element = e.target || e;
 		this.setState({open: false});
@@ -66,17 +70,25 @@ class Dropdown extends React.Component {
 				this.setState({showInfo: true});
 				this.setState({showMap: true});
 			}
+			return 0;
 		});
 	};
 
+	// Обработка нажатий клавиш (стрелка вверх, стрелка вниз, Enter)
+	// Навигация по выпадающему списку
 	checkKey = (e) => {
 		const lis = document.querySelectorAll('.menu-item1');
 		if (e.keyCode === 13) {
-			if (lis.length > 0) {
-				for (let i = 0; i < lis.length; i ++) {
-					const selected = lis[i].getAttribute('style');
-					if (selected === 'background-color: gray') {
-						this.handleItemClick(lis[i]);
+			if (!this.state.open) {
+				this.setState({open: true});
+			}
+			else {
+				if (lis.length > 0) {
+					for (let i = 0; i < lis.length; i ++) {
+						const selected = lis[i].getAttribute('style');
+						if (selected === 'background-color: gray') {
+							this.handleItemClick(lis[i]);
+						}
 					}
 				}
 			}
@@ -116,18 +128,23 @@ class Dropdown extends React.Component {
 		}
 	};
 
+	// Обработчик изменений текста в поле
 	handleChange = (event) => {
 		document.onkeydown = this.checkKey;
-		const { classes } = this.props;
 		this.i ++;
+		// Запрос на локальный сервер
 		axios(`http://localhost:3011?search=${event.target.value}`, {headers: {'Content-Type': 'application/json'}})
 			.then(response => {
 				this.children = [];
 				this.dataElements = [];
+				// Обработка данных с сервера
 				response.data.items.map(item => {
 					const insert = <MenuItem className="menu-item1" onClick={this.handleItemClick} id={item.id} key={`key-${item.id}`}>{ item.name } - { item.description }</MenuItem>;
+						// Заполнение элементов	всплывающего списка
 						this.children.push(insert);
+						// Заполнение данных о компаниях в один список
 						this.dataElements.push(item);
+						return 0;
 				});
 				this.setState({children: this.children});
 			})
@@ -136,9 +153,11 @@ class Dropdown extends React.Component {
 			});
 	};
 
+	// Рендер компонента
   render() {
     const { classes } = this.props;
     const { anchorEl, open, placement } = this.state;
+		// Инициализация компонента Карта
 		const map = () => (
 			<Grid item xs={6}>
 				<Typography className={classes.typography} variant="subtitle1">Место на карте</Typography>
@@ -149,6 +168,7 @@ class Dropdown extends React.Component {
 				/>
 			</Grid>
 		);
+		// Инициализация компонента Информация о компании
 		const info = () => (
 			<Grid item xs={6}>
 				<CompanyInfo data={this.dataCompany} />
@@ -156,10 +176,12 @@ class Dropdown extends React.Component {
 		);
     return (
       <div className={classes.root}>
+				{/* Элемент Всплывающий список */}
         <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
           {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={350}>
               <Paper>
+								{/* Элементы всплывающего списка */}
 								{ this.state.children }
               </Paper>
             </Fade>
@@ -167,6 +189,7 @@ class Dropdown extends React.Component {
         </Popper>
         <Grid container justify="center">
           <Grid item xs={6}>
+						{/* Элемент Текстовое полe для поиска */}
 						<TextField
 							id="outlined-full-width"
 							label="Поиск по организациям в Яндекс"
@@ -184,9 +207,11 @@ class Dropdown extends React.Component {
           </Grid>
         </Grid>
 				<Grid container justify="center">
+					{/* Элемент Информация о компании */}
 					{ this.state.showInfo? info() : '' }
 				</Grid>
 				<Grid container justify="center">
+					{/* Элемент Карта */}
 					{ this.state.showMap? map() : '' }
 				</Grid>
       </div>
@@ -194,8 +219,10 @@ class Dropdown extends React.Component {
   }
 }
 
-Dropdown.propTypes = {
+// Проверка типов props
+Search.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Dropdown);
+// Экспорт компонента по умолчанию, со стилями компонента
+export default withStyles(styles)(Search);

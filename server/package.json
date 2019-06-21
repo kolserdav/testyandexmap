@@ -1,0 +1,16 @@
+{
+  "name": "server-yandex-orgs-search",
+  "version": "1.0.0",
+  "description": "Backend for search organization in Yandex",
+  "main": "index.js",
+  "repository": "http://github.com/kolserdav/testyandexmap",
+  "author": "kolserdav",
+  "license": "MIT",
+  "scripts": {
+    "up": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "request": "^2.88.0"
+  }
+}
