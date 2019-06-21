@@ -11,6 +11,9 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import axios from 'axios';
 
+// Components
+import YMap from './map.js';
+import CompanyInfo from './companyInfo.js';
 
 const styles = theme => ({
 	menuItem: {
@@ -20,7 +23,7 @@ const styles = theme => ({
 		padding: '20px',
   },
   typography: {
-    padding: theme.spacing(2),
+    padding: '20px',
   },
 });
 
@@ -33,7 +36,9 @@ class Dropdown extends React.Component {
 			anchorEl: null,
 			open: false,
 			placement: null,
-			children: []
+			children: [],
+			showMap: false,
+			showInfo: false
 		};
 		this.i = 0;
 		this.liItem = -1;
@@ -45,7 +50,7 @@ class Dropdown extends React.Component {
       anchorEl: currentTarget,
       open: true,
       placement,
-    }));
+    }));	
   };
 
 	handleItemClick = (e) => {
@@ -54,34 +59,18 @@ class Dropdown extends React.Component {
 		const elementId = element.getAttribute('id');
 		this.dataElements.map(item => {
 			if (item.id === elementId) {
-				console.log(item)
+				this.lat = item.geometry.coordinates[1];
+				this.lon = item.geometry.coordinates[0];
+				this.name = item.name;
+				this.dataCompany = item;
+				this.setState({showInfo: true});
+				this.setState({showMap: true});
 			}
 		});
 	};
- 
-	componentDidMount() {
-		//ymaps.ready(this.initMap);
-	}
-
-	/*initMap() {
-    var myMap = new ymaps.Map("map", {
-				center: [55.76, 37.64],
-				zoom: 10
-			}, {
-				searchControlProvider: 'yandex#search'
-			});
-    myMap.geoObjects
-			.add(new ymaps.Placemark([55.694843, 37.435023], {
-				balloonContent: 'цвет <strong>носика Гены</strong>',
-				iconCaption: 'Очень длиннный, но невероятно интересный текст'
-			}, {
-				preset: 'islands#greenDotIconWithCaption'
-			}))
-		}*/
-
 
 	checkKey = (e) => {
-		const lis = document.querySelectorAll('li');
+		const lis = document.querySelectorAll('.menu-item1');
 		if (e.keyCode === 13) {
 			if (lis.length > 0) {
 				for (let i = 0; i < lis.length; i ++) {
@@ -136,7 +125,7 @@ class Dropdown extends React.Component {
 				this.children = [];
 				this.dataElements = [];
 				response.data.items.map(item => {
-					const insert = <MenuItem onClick={this.handleItemClick} id={item.id} key={`key-${item.id}`}>{ item.name } - { item.description }</MenuItem>;
+					const insert = <MenuItem className="menu-item1" onClick={this.handleItemClick} id={item.id} key={`key-${item.id}`}>{ item.name } - { item.description }</MenuItem>;
 						this.children.push(insert);
 						this.dataElements.push(item);
 				});
@@ -150,7 +139,21 @@ class Dropdown extends React.Component {
   render() {
     const { classes } = this.props;
     const { anchorEl, open, placement } = this.state;
-
+		const map = () => (
+			<Grid item xs={6}>
+				<Typography className={classes.typography} variant="subtitle1">Место на карте</Typography>
+				<YMap
+					lat={this.lat}
+					lon={this.lon}
+					name={this.name}
+				/>
+			</Grid>
+		);
+		const info = () => (
+			<Grid item xs={6}>
+				<CompanyInfo data={this.dataCompany} />
+			</Grid>
+		);
     return (
       <div className={classes.root}>
         <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
@@ -166,7 +169,7 @@ class Dropdown extends React.Component {
           <Grid item xs={6}>
 						<TextField
 							id="outlined-full-width"
-							label="Поиск в Яндекс картах"
+							label="Поиск по организациям в Яндекс"
 							style={{ margin: 8 }}
 							placeholder="Название организации"
 							fullWidth
@@ -180,6 +183,12 @@ class Dropdown extends React.Component {
 						/>
           </Grid>
         </Grid>
+				<Grid container justify="center">
+					{ this.state.showInfo? info() : '' }
+				</Grid>
+				<Grid container justify="center">
+					{ this.state.showMap? map() : '' }
+				</Grid>
       </div>
     );
   }
