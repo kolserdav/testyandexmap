@@ -2,11 +2,11 @@
 
 #### Installation ####
 
-`git clone https://github.com/kolserdav/testyandexmap testyandexmap`
-`cd testyandexmap/server`
-`yarn install`
-`cd ../app`
-`yarn install`
+`git clone https://github.com/kolserdav/testyandexmap testyandexmap`  
+`cd testyandexmap/server`  
+`yarn install`  
+`cd ../app`  
+`yarn install`  
 
 #### Settings ####
 
@@ -16,9 +16,9 @@ Set your Yandex API Key
 #### Run ####
 
 1. Start the server
-`cd server`
+`cd server`  
 `yarn up`
 
 2. Start the application
-`cd app`
+`cd app`   
 `yarn start`
